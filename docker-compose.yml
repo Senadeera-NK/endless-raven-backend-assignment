@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - JWT_SECRET=super_secret_raven_2026
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+    depends_on:
+      - auth-service
+      - product-service
+
+  auth-service:
+    build: ./auth-service
+    environment:
+      - DATABASE_URL=file:/app/prisma/auth.db
+      - JWT_SECRET=super_secret_raven_2026
+    volumes:
+      - ./auth-service/prisma:/app/prisma
+
+  product-service:
+    build: ./product-service
+    environment:
+      - DATABASE_URL=file:/app/prisma/product.db
+    volumes:
+      - ./product-service/prisma:/app/prisma

@@ -3,14 +3,24 @@ const { PrismaClient } = require("@prisma/client");
 // FIXED IMPORT BELOW
 const { PrismaLibSql } = require('@prisma/adapter-libsql'); // Changed: lowercase 'ql'
 const { createClient } = require("@libsql/client");
-require('dotenv').config();
 
+if (!process.env.DATABASE_URL) {
+  require('dotenv').config();
+}
 const app = express();
+
+console.log('DATABASE_URL:', process.env.DATABASE_URL || 'NOT SET');
+
 app.use(express.json());
 
 // Setup Connection
-const libsql = createClient({ url: 'file:./prisma/product.db' });
-const adapter = new PrismaLibSql(libsql);
+const dbUrl = process.env.DATABASE_URL;
+
+if (!dbUrl) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
+const adapter = new PrismaLibSql({url:dbUrl});
 const prisma = new PrismaClient({ adapter });
 
 // POST /products
@@ -26,7 +36,7 @@ app.post('/products', async (req, res) => {
         });
         res.status(201).json(product);
     } catch (err) {
-        res.status(400).json({ error: "failed to create product" });
+        res.status(400).json({ error: err.message });
     }
 });
 

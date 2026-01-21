@@ -7,6 +7,16 @@ const app = express();
 const PORT = 3000;
 const JWT_SECRET = process.env.JWT_SECRET ||'super_secret_raven_2026';
 
+// Log EVERY incoming request
+app.use((req, res, next) => {
+    console.log('========================================');
+    console.log('INCOMING REQUEST:', req.method, req.url);
+    console.log('Headers:', req.headers);
+    console.log('========================================');
+    next();
+});
+
+
 //middleware
 const authenticateToken = (req, res, next) =>{
     const authHeader = req.headers['authorization'];
@@ -21,21 +31,43 @@ const authenticateToken = (req, res, next) =>{
     });
 };
 
+const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3001';
+const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || 'http://localhost:3002';
+
+console.log('========================================');
+console.log('AUTH_SERVICE_URL:', AUTH_SERVICE_URL);
+console.log('PRODUCT_SERVICE_URL:', PRODUCT_SERVICE_URL);
+console.log('========================================');
+
 app.use('/auth', createProxyMiddleware({
-    target:'http://localhost:3001',
+    target:AUTH_SERVICE_URL,
     changeOrigin:true,
 }));
+app.use(['/products', '/stock'], authenticateToken);
 
-app.use('/products', authenticateToken, createProxyMiddleware({
-    target:'http://localhost:3002',
-    changeOrigin:true
+// 2. Transparent Proxy for Products
+app.use(createProxyMiddleware({
+    pathFilter: '/products',
+    target: PRODUCT_SERVICE_URL,
+    changeOrigin: true,
+    onProxyReq: (proxyReq, req, res) => {
+        console.log('>>> PROXYING PRODUCT:', req.method, PRODUCT_SERVICE_URL + req.url);
+    },
+    onError: (err, req, res) => {
+        console.error('>>> PROXY ERROR:', err.message);
+        res.status(500).json({ error: 'Proxy error', details: err.message });
+    }
 }));
 
-app.use('/stock', authenticateToken, createProxyMiddleware({
-    target:'http://localhost:3002',
-    changeOrigin:true
+// 3. Transparent Proxy for Stock
+app.use(createProxyMiddleware({
+    pathFilter: '/stock',
+    target: PRODUCT_SERVICE_URL,
+    changeOrigin: true,
+    onProxyReq: (proxyReq, req, res) => {
+        console.log('>>> PROXYING STOCK:', req.method, PRODUCT_SERVICE_URL + req.url);
+    }
 }));
-
 app.listen(PORT, ()=>{
     console.log(`API gateway running on http://localhost:${PORT}`);
     console.log(`Forwarding /auth to port 3001`);

@@ -1,4 +1,3 @@
-// prisma.config.js
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
@@ -7,5 +6,8 @@ export default defineConfig({
   migrations: {
     path: "prisma/migrations",
   },
-  // Remove the datasource section - it's handled by the adapter in your code
+  datasource: {
+    // The CLI needs this to find the file and create tables
+    url: "file:./prisma/product.db", 
+  },
 });
