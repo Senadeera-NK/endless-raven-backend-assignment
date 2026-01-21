@@ -13,14 +13,14 @@ model Product {
   id             Int        @id @default(autoincrement())
   name           String
   stock_quantity Int        @default(0)
-  company_id     Int        // No relation here! Just the ID from the JWT
+  company_id     Int       
   logs           StockLog[]
 }
 
 model StockLog {
   id            Int      @id @default(autoincrement())
   product_id    Int
-  change_amount Int      // e.g., +10 or -5
+  change_amount Int     
   reason        String
   created_at    DateTime @default(now())
   product       Product  @relation(fields: [product_id], references: [id])

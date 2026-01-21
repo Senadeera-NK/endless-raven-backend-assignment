@@ -13,16 +13,12 @@ const app = express();
 
 console.log('DATABASE_URL:', process.env.DATABASE_URL || 'NOT SET');
 
-// Create the connection and the adapter
+// connection and the adapter
 const dbUrl = process.env.DATABASE_URL;
 
 if (!dbUrl) {
   throw new Error('DATABASE_URL environment variable is not set');
 }
-
-// const libsql = createClient({
-//   url: dbUrl // Path to your auth db
-// });
 
 const adapter = new PrismaLibSql({url:dbUrl});
 

@@ -1,6 +1,5 @@
 const express = require('express');
 const { PrismaClient } = require("@prisma/client");
-// FIXED IMPORT BELOW
 const { PrismaLibSql } = require('@prisma/adapter-libsql'); // Changed: lowercase 'ql'
 const { createClient } = require("@libsql/client");
 
@@ -50,14 +49,12 @@ app.get('/products', async (req, res) => {
     }
 });
 
-// POST /stock/update (Requirements: 9 & 11)
+// POST /stock/update
 app.post('/stock/update', async (req, res) => {
-    // In a POST request, data comes from req.body, not req.params
     const { product_id, change_amount, reason } = req.body; 
 
     try {
         const result = await prisma.$transaction(async (tx) => {
-            // 1. You must FETCH the product first to see current stock
             const product = await tx.product.findUnique({
                 where: { id: parseInt(product_id) }
             });
@@ -66,16 +63,16 @@ app.post('/stock/update', async (req, res) => {
 
             const newQuantity = product.stock_quantity + parseInt(change_amount);
 
-            // Mandatory Business Rule: Never below zero
+            // Never below zero
             if (newQuantity < 0) throw new Error("Insufficient stock: Values must never go negative");
 
-            // 2. Update stock
+            // Update stock
             const updatedProduct = await tx.product.update({
                 where: { id: parseInt(product_id) },
                 data: { stock_quantity: newQuantity }
             });
 
-            // 3. Create audit log (Mandatory)
+            // creating audit log 
             await tx.stockLog.create({
                 data: {
                     product_id: parseInt(product_id),

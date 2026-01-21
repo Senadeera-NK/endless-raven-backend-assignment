@@ -7,5 +7,4 @@ export default defineConfig({
   migrations: {
     path: "prisma/migrations",
   },
-  // Remove the datasource section - it's handled by the adapter in your code
 });

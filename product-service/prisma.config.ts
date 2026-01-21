@@ -7,7 +7,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // The CLI needs this to find the file and create tables
     url: "file:./prisma/product.db", 
   },
 });

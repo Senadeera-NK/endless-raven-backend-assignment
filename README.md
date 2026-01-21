@@ -32,6 +32,8 @@ Once the build is complete, you should see logs indicating:
 Gateway running on http://localhost:3000
 Auth service running on port 3001
 Product service running on port 3002
+Health Check: Visit http://localhost:3000/health to verify system status.
+
 
 Documentation & Testing
 Detailed documentation is available in the /docs folder:
