@@ -1,25 +1,42 @@
 const express = require("express");
+const path = require('path');
 const {PrismaClient} = require("@prisma/client");
 const { PrismaLibSql } = require('@prisma/adapter-libsql'); // Changed: lowercase 'ql'
 const { createClient } = require('@libsql/client');  
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
+if (!process.env.DATABASE_URL) {
+  require('dotenv').config();
+}
 const app = express();
-// Create the connection and the adapter
-const libsql = createClient({
-  url: 'file:./prisma/auth.db', // Path to your auth db
-});
-const adapter = new PrismaLibSql(libsql);
 
-const prisma = new PrismaClient({adapter});
+console.log('DATABASE_URL:', process.env.DATABASE_URL || 'NOT SET');
+
+// Create the connection and the adapter
+const dbUrl = process.env.DATABASE_URL;
+
+if (!dbUrl) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
+// const libsql = createClient({
+//   url: dbUrl // Path to your auth db
+// });
+
+const adapter = new PrismaLibSql({url:dbUrl});
+
+const prisma = new PrismaClient({ adapter});
+
+
+prisma.$connect().then(()=>console.log("successfully connected to the db"))
+.catch((e)=>console.error("database connection failed:",e));
 app.use(express.json());
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // creatin the company and first user
-app.post('/auth/register',async(req,res)=>{
+app.post(['/auth/register','/register'],async(req,res)=>{
     try{
         const {email, password, companyName} = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,15 +52,15 @@ app.post('/auth/register',async(req,res)=>{
                 }
             }
         });
-        res.status(201).json({mesage:"company and user registered successfully"});
+        res.status(201).json({message:"company and user registered successfully"});
     }catch(err){
         console.error(err);
-        res.status(400).json({error:"registration dailed. email might existed already"});
+        res.status(400).json({error:err.message, code:err.code});
     }
 });
 
 // login - (returns the jwt token with user_id and company_id)
-app.post('/auth/login',async(req, res)=>{
+app.post(['/auth/login','/login'],async(req, res)=>{
     try{
         const {email, password} = req.body;
         const user = await prisma.user.findUnique({
@@ -56,7 +73,7 @@ app.post('/auth/login',async(req, res)=>{
 
         // creating the jwt payload
         const token = jwt.sign(
-            {user_id:user_id, company_id:user.company_id, role:"admin"},
+            {user_id:user.id, company_id:user.company_id, role:"admin"},
             JWT_SECRET,
             {expiresIn:'24h'}
         );

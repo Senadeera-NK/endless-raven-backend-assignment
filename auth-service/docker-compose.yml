@@ -1,0 +1,11 @@
+services:
+  auth-service:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=file:/app/prisma/auth.db
+      - JWT_SECRET=super_secret_raven_2026
+      - PORT=3001
+    volumes:
+      - ./prisma:/app/prisma

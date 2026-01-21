@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET ||'super_secret_raven_2026';
 
 //middleware
 const authenticateToken = (req, res, next) =>{
-    const authHeader = req.header['authorization'];
+    const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if(!token) return res.status(401).json({error:"Access denied. No token provided."});
@@ -22,17 +22,17 @@ const authenticateToken = (req, res, next) =>{
 };
 
 app.use('/auth', createProxyMiddleware({
-    target:'http:localhost:3001',
-    changeOrigin:true
+    target:'http://localhost:3001',
+    changeOrigin:true,
 }));
 
 app.use('/products', authenticateToken, createProxyMiddleware({
-    target:'http:localhost:3002',
+    target:'http://localhost:3002',
     changeOrigin:true
 }));
 
 app.use('/stock', authenticateToken, createProxyMiddleware({
-    target:'http:localhost:3002',
+    target:'http://localhost:3002',
     changeOrigin:true
 }));
 
