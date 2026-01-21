@@ -156,12 +156,12 @@
           }
         },
         "url": {
-          "raw": "http://localhost:3002/stock/update",
+          "raw": "http://localhost:3000/stock/update",
           "protocol": "http",
           "host": [
             "localhost"
           ],
-          "port": "3002",
+          "port": "3000",
           "path": [
             "stock",
             "update"
@@ -204,6 +204,42 @@
           "path": [
             "stock",
             "update"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "health_check",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJjb21wYW55X2lkIjozLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Njg5ODg0NDEsImV4cCI6MTc2OTA3NDg0MX0.Bwnj_L4IHekQEdFOid9ZbcqFnbQEJrXx-9PFEqU2w_w",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n \"product_id\": 1,\r\n \"change_amount\": 1000, \r\n \"reason\": \"Big Sale\" \r\n }"
+        },
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "health"
           ]
         }
       },
