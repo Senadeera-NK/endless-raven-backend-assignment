@@ -2,7 +2,7 @@
 
 This project is a Microservices-based Backend system developed for the Technical Assignment at **Endless Raven (Pvt) Ltd**. It demonstrates a scalable architecture using Node.js, Docker, and an API Gateway.
 
-## 🏗 System Architecture
+## System Architecture
 
 The system consists of three independent services:
 1.  **API Gateway (Port 3000):** The single entry point. Handles routing and JWT authentication.
@@ -19,21 +19,23 @@ The entire system is containerized. You do not need to install Node.js or databa
 ```bash
 git clone "https://github.com/Senadeera-NK/endless-raven-backend-assignment.git"
 cd endless-raven-backend-assignment
+```
 
 2. Start the services
 Run the following command from the root directory:
 
-Bash
+```bash
 docker-compose up --build
-
+```
 3. Verify the Services
 Once the build is complete, you should see logs indicating:
 
+```bash
 Gateway running on http://localhost:3000
 Auth service running on port 3001
 Product service running on port 3002
 Health Check: Visit http://localhost:3000/health to verify system status.
-
+```
 
 Documentation & Testing
 Detailed documentation is available in the /docs folder:
